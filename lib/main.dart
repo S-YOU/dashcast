@@ -9,11 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      title: 'The Boring Show!',
       home: BoringPage(),
     );
   }
@@ -23,21 +19,64 @@ class BoringPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: PlaybackButtton()),
+      body: SafeArea(child: DashCastApp()),
+    );
+  }
+}
+class DashCastApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Flexible(
+          flex: 9,
+          child: Placeholder(),
+        ),
+        Flexible(
+          flex: 1,
+          child: AudioControls(),
+        ),
+      ],
     );
   }
 }
 
-class PlaybackButtton extends StatefulWidget {
+class AudioControls extends StatelessWidget {
   @override
-  _PlaybackButttonState createState() => _PlaybackButttonState();
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        PlaybackButtons(),
+      ],
+    );
+  }
 }
 
-class _PlaybackButttonState extends State<PlaybackButtton> {
+class PlaybackButtons extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[PlaybackButton()],
+    );
+  }
+}
+
+class PlaybackButton extends StatefulWidget {
+  @override
+  _PlaybackButtonState createState() => _PlaybackButtonState();
+}
+
+class _PlaybackButtonState extends State<PlaybackButton> {
   bool _isPlaying = false;
   FlutterSound _sound;
   final _url =
       'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3';
+
+  @override
+  void initState() {
+    super.initState();
+    _sound = new FlutterSound();
+  }
 
   void stop() async {
     await _sound.stopPlayer();
@@ -45,8 +84,6 @@ class _PlaybackButttonState extends State<PlaybackButtton> {
   }
 
   void play() async {
-    _sound = new FlutterSound();
-
     String path = await _sound.startPlayer(_url);
     print('startPlayer: $path');
   }
