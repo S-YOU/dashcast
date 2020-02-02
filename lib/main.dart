@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,10 +35,21 @@ class PlaybackButtton extends StatefulWidget {
 
 class _PlaybackButttonState extends State<PlaybackButtton> {
   bool _isPlaying = false;
+  FlutterSound _sound;
+  final _url =
+      'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3';
 
-  void stop() {}
+  void stop() async {
+    await _sound.stopPlayer();
+    setState(() => _isPlaying = false);
+  }
 
-  void play() {}
+  void play() async {
+    _sound = new FlutterSound();
+
+    String path = await _sound.startPlayer(_url);
+    print('startPlayer: $path');
+  }
 
   @override
   Widget build(BuildContext context) {
