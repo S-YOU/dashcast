@@ -23,6 +23,7 @@ class BoringPage extends StatelessWidget {
     );
   }
 }
+
 class DashCastApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -52,30 +53,24 @@ class AudioControls extends StatelessWidget {
   }
 }
 
-class PlaybackButtons extends StatelessWidget {
+
+class PlaybackButtons extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[PlaybackButton()],
-    );
-  }
+  _PlaybackButtonsState createState() => _PlaybackButtonsState();
 }
 
-class PlaybackButton extends StatefulWidget {
-  @override
-  _PlaybackButtonState createState() => _PlaybackButtonState();
-}
-
-class _PlaybackButtonState extends State<PlaybackButton> {
+class _PlaybackButtonsState extends State<PlaybackButtons> {
   bool _isPlaying = false;
   FlutterSound _sound;
   final _url =
       'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3';
+  double playPosition;
 
   @override
   void initState() {
     super.initState();
     _sound = new FlutterSound();
+    playPosition =  0;
   }
 
   void stop() async {
@@ -88,11 +83,39 @@ class _PlaybackButtonState extends State<PlaybackButton> {
     print('startPlayer: $path');
   }
 
+  void fastForward(args) {
+
+  }
+
+  void fastRewind(args) {
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-      onPressed: () => _playSound(),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Slider(
+          value: 0.2,
+        ),
+        Row(
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.fast_rewind),
+              onPressed: () => {},
+            ),
+            IconButton(
+              icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+              onPressed: () => _playSound(),
+            ),
+            IconButton(
+              icon: Icon(Icons.fast_forward),
+              onPressed: () => {},
+            ),
+          ],
+        ),
+      ],
     );
   }
 
