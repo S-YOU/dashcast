@@ -53,7 +53,6 @@ class AudioControls extends StatelessWidget {
   }
 }
 
-
 class PlaybackButtons extends StatefulWidget {
   @override
   _PlaybackButtonsState createState() => _PlaybackButtonsState();
@@ -64,13 +63,14 @@ class _PlaybackButtonsState extends State<PlaybackButtons> {
   FlutterSound _sound;
   final _url =
       'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3';
-  double playPosition;
+  double _playPosition;
+  Stream<PlayStatus> _playerSubscription;
 
   @override
   void initState() {
     super.initState();
     _sound = new FlutterSound();
-    playPosition =  0;
+    _playPosition = 0;
   }
 
   void stop() async {
@@ -79,17 +79,20 @@ class _PlaybackButtonsState extends State<PlaybackButtons> {
   }
 
   void play() async {
-    String path = await _sound.startPlayer(_url);
-    print('startPlayer: $path');
+    await _sound.startPlayer(_url);
+    _playerSubscription = _sound.onPlayerStateChanged
+      ..listen((e) {
+        if (e != null) {
+          print(e.currentPosition);
+          setState(() => _playPosition = (e.currentPosition / e.duration));
+        }
+      });
+    setState(() => _isPlaying = true);
   }
 
-  void fastForward(args) {
+  void fastForward(args) {}
 
-  }
-
-  void fastRewind(args) {
-
-  }
+  void fastRewind(args) {}
 
   @override
   Widget build(BuildContext context) {
@@ -103,28 +106,24 @@ class _PlaybackButtonsState extends State<PlaybackButtons> {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.fast_rewind),
-              onPressed: () => {},
+              onPressed: null,
             ),
             IconButton(
-              icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-              onPressed: () => _playSound(),
-            ),
+                icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+                onPressed: () {
+                  if (_isPlaying) {
+                    stop();
+                  } else {
+                    play();
+                  }
+                }),
             IconButton(
               icon: Icon(Icons.fast_forward),
-              onPressed: () => {},
+              onPressed: null,
             ),
           ],
         ),
       ],
     );
-  }
-
-  void _playSound() {
-    if (_isPlaying) {
-      stop();
-    } else {
-      play();
-    }
-    setState(() => _isPlaying = !_isPlaying);
   }
 }
