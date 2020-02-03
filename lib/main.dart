@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
@@ -34,7 +32,7 @@ class DashCastApp extends StatelessWidget {
           child: Placeholder(),
         ),
         Flexible(
-          flex: 1,
+          flex: 2,
           child: AudioControls(),
         ),
       ],
@@ -55,13 +53,13 @@ class AudioControls extends StatelessWidget {
 
 class PlaybackButtons extends StatefulWidget {
   @override
-  _PlaybackButtonsState createState() => _PlaybackButtonsState();
+  _PlaybackButtonState createState() => _PlaybackButtonState();
 }
 
-class _PlaybackButtonsState extends State<PlaybackButtons> {
+class _PlaybackButtonState extends State<PlaybackButtons> {
   bool _isPlaying = false;
   FlutterSound _sound;
-  final _url =
+  final url =
       'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3';
   double _playPosition;
   Stream<PlayStatus> _playerSubscription;
@@ -69,17 +67,17 @@ class _PlaybackButtonsState extends State<PlaybackButtons> {
   @override
   void initState() {
     super.initState();
-    _sound = new FlutterSound();
+    _sound = FlutterSound();
     _playPosition = 0;
   }
 
-  void stop() async {
+  void _stop() async {
     await _sound.stopPlayer();
     setState(() => _isPlaying = false);
   }
 
-  void play() async {
-    await _sound.startPlayer(_url);
+  void _play() async {
+    await _sound.startPlayer(url);
     _playerSubscription = _sound.onPlayerStateChanged
       ..listen((e) {
         if (e != null) {
@@ -90,36 +88,36 @@ class _PlaybackButtonsState extends State<PlaybackButtons> {
     setState(() => _isPlaying = true);
   }
 
-  void fastForward(args) {}
+  void _fastForward() {}
 
-  void fastRewind(args) {}
+  void _rewind() {}
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Slider(
-          value: 0.2,
-        ),
+        Slider(value: _playPosition),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.fast_rewind),
-              onPressed: null,
+              onPressed: () => _rewind(),
             ),
             IconButton(
-                icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-                onPressed: () {
-                  if (_isPlaying) {
-                    stop();
-                  } else {
-                    play();
-                  }
-                }),
+              icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+              onPressed: () {
+                if (_isPlaying) {
+                  _stop();
+                } else {
+                  _play();
+                }
+              },
+            ),
             IconButton(
               icon: Icon(Icons.fast_forward),
-              onPressed: null,
+              onPressed: () => _fastForward(),
             ),
           ],
         ),
