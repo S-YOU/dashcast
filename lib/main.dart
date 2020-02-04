@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 
+final url = 'https://itsallwidgets.com/podcast/feed';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -8,21 +9,28 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'The Boring Show!',
-      home: BoringPage(),
+      home: EpisodesPage(),
     );
   }
 }
 
-class BoringPage extends StatelessWidget {
+class EpisodesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class PlayerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: DashCastApp()),
+      body: SafeArea(child: Player()),
     );
   }
 }
 
-class DashCastApp extends StatelessWidget {
+class Player extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
