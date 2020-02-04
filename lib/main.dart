@@ -76,10 +76,9 @@ class EpisodeListView extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               onTap: () {
+                Provider.of<Podcast>(context).selectedItem = e;
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PlayerPage(item: i),
-                  ),
+                  MaterialPageRoute(builder: (_) => PlayerPage()),
                 );
               },
             ),
@@ -97,7 +96,11 @@ class PlayerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(item.title)),
+      appBar: AppBar(
+        title: Text(
+          Provider.of<Podcast>(context).selectedItem.title,
+        ),
+      ),
       body: SafeArea(child: Player()),
     );
   }
