@@ -28,10 +28,7 @@ class EpisodesPage extends StatelessWidget {
             if (response.statusCode == 200) {
               final rssString = response.body;
               var rssFeed = RssFeed.parse(rssString);
-              return ListView(
-                children:
-                    rssFeed.items.map((e) => ListTile(title: Text(e.title))).toList(),
-              );
+              return EpisodeListView(rssFeed: rssFeed);
             }
           } else {
             return Center(child: CircularProgressIndicator());
@@ -42,10 +39,49 @@ class EpisodesPage extends StatelessWidget {
   }
 }
 
+class EpisodeListView extends StatelessWidget {
+  final RssFeed rssFeed;
+
+  const EpisodeListView({
+    Key key,
+    this.rssFeed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: rssFeed.items
+          .map(
+            (e) => ListTile(
+              title: Text(e.title),
+              subtitle: Text(
+                e.description,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PlayerPage(item: i),
+                  ),
+                );
+              },
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
 class PlayerPage extends StatelessWidget {
+  final RssItem item;
+
+  const PlayerPage({Key key, this.item}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text(item.title)),
       body: SafeArea(child: Player()),
     );
   }
