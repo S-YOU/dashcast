@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
 final url = 'https://itsallwidgets.com/podcast/feed';
@@ -29,9 +30,12 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'The Boring Show!',
-      home: EpisodesPage(),
+    return ChangeNotifierProvider(
+      create: (_) => Podcast()..parse(url),
+      child: MaterialApp(
+        title: 'The Boring Show!',
+        home: EpisodesPage(),
+      ),
     );
   }
 }
@@ -40,21 +44,13 @@ class EpisodesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: http.get(url),
-        builder: (context, AsyncSnapshot<http.Response> snapshot) {
-          if (snapshot.hasData) {
-            final response = snapshot.data;
-            if (response.statusCode == 200) {
-              final rssString = response.body;
-              var rssFeed = RssFeed.parse(rssString);
-              return EpisodeListView(rssFeed: rssFeed);
-            }
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+      body: Consumer<Podcast>(builder: (context, podcast, _) {
+        return podcast.feed != null
+            ? EpisodeListView(rssFeed: podcast.feed)
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+      }),
     );
   }
 }
