@@ -1,6 +1,6 @@
 # dashcast
 
-A new Flutter project.
+A podcast player written in Flutter.
 
 ## Getting Started
 
