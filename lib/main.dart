@@ -56,27 +56,27 @@ class EpisodesPage extends StatelessWidget {
 }
 
 class EpisodeListView extends StatelessWidget {
-  final RssFeed rssFeed;
-
   const EpisodeListView({
     Key key,
-    this.rssFeed,
+    @required this.rssFeed,
   }) : super(key: key);
+
+  final RssFeed rssFeed;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: rssFeed.items
           .map(
-            (e) => ListTile(
-              title: Text(e.title),
+            (i) => ListTile(
+              title: Text(i.title),
               subtitle: Text(
-                e.description,
+                i.description,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
               onTap: () {
-                Provider.of<Podcast>(context).selectedItem = e;
+                Provider.of<Podcast>(context).selectedItem = i;
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => PlayerPage()),
                 );
@@ -109,15 +109,30 @@ class PlayerPage extends StatelessWidget {
 class Player extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final podcast = Provider.of<Podcast>(context);
+
     return Column(
-      children: <Widget>[
+      children: [
         Flexible(
-          flex: 9,
-          child: Placeholder(),
+          flex: 8,
+          child: SingleChildScrollView(
+            child: Column(children: [
+              Image.network(podcast.feed.image.url),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  podcast.selectedItem.description.trim(),
+                ),
+              ),
+            ]),
+          ),
         ),
         Flexible(
           flex: 2,
-          child: AudioControls(),
+          child: Material(
+            elevation: 12,
+            child: AudioControls(),
+          ),
         ),
       ],
     );
@@ -143,8 +158,7 @@ class PlaybackButtons extends StatefulWidget {
 class _PlaybackButtonState extends State<PlaybackButtons> {
   bool _isPlaying = false;
   FlutterSound _sound;
-  final url =
-      'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3';
+
   double _playPosition;
   Stream<PlayStatus> _playerSubscription;
 
@@ -160,7 +174,7 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
     setState(() => _isPlaying = false);
   }
 
-  void _play() async {
+  void _play(String url) async {
     await _sound.startPlayer(url);
     _playerSubscription = _sound.onPlayerStateChanged
       ..listen((e) {
@@ -178,10 +192,15 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
 
   @override
   Widget build(BuildContext context) {
+    final item = Provider.of<Podcast>(context).selectedItem;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Slider(value: _playPosition),
+        Slider(
+          value: _playPosition,
+          onChanged: null,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -195,7 +214,7 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
                 if (_isPlaying) {
                   _stop();
                 } else {
-                  _play();
+                  _play(item.guid);
                 }
               },
             ),
