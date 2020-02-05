@@ -37,17 +37,27 @@ class Podcast with ChangeNotifier {
     notifyListeners();
   }
 
-  void download(RssItem item) async {
-    http.StreamedRequest req = http.StreamedRequest(
-      'GET',
-      Uri.parse(item.guid),
-    );
+  void download(RssItem item, [Function(double) callback]) async {
+    final req = http.Request('GET', Uri.parse(item.guid));
     final res = await req.send();
     if (res.statusCode != 200)
-      throw Exception('Unexpected HTTP Code: ${res.statusCode}');
+      throw Exception('Unexpected HTTP code: ${res.statusCode}');
+
+    final contentLength = res.contentLength;
+    var downloadedLength = 0;
 
     final file = File(await _getDownloadPath(path.split(item.guid).last));
-    res.stream.pipe(file.openWrite()).whenComplete(() => print('Download completed!'));
+    res.stream
+        .map((chunk) {
+          downloadedLength += chunk.length;
+          if (callback != null) callback(downloadedLength / contentLength);
+          return chunk;
+        })
+        .pipe(file.openWrite())
+        .whenComplete(() {
+          print('Downloading complete');
+        })
+        .catchError((e) => print('An Error has occurred!!!: $e'));
   }
 }
 
@@ -89,6 +99,8 @@ class EpisodeListView extends StatelessWidget {
 
   final RssFeed rssFeed;
 
+  void downloadStatus(double num) => print('$num');
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -104,9 +116,10 @@ class EpisodeListView extends StatelessWidget {
               trailing: IconButton(
                 icon: Icon(Icons.arrow_downward),
                 onPressed: () {
+                  Provider.of<Podcast>(context).download(i);
                   Scaffold.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Dowloading!'),
+                      content: Text('Downloading ${i.title}'),
                     ),
                   );
                 },
