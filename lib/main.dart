@@ -1,14 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 final url = 'https://itsallwidgets.com/podcast/feed';
+
+final pathSuffix = 'dashcast/downloads';
 
 class Podcast with ChangeNotifier {
   RssFeed _feed;
   RssItem _selectedItem;
+  Map<String, bool> downloadStatus;
 
   RssFeed get feed => _feed;
   void parse(String url) async {
@@ -74,6 +81,16 @@ class EpisodeListView extends StatelessWidget {
                 i.description,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.arrow_downward),
+                onPressed: () {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Dowloading!'),
+                    ),
+                  );
+                },
               ),
               onTap: () {
                 Provider.of<Podcast>(context).selectedItem = i;
