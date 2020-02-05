@@ -12,6 +12,12 @@ final url = 'https://itsallwidgets.com/podcast/feed';
 
 final pathSuffix = 'dashcast/downloads';
 
+Future<String> _getDownloadPath(String filename) async {
+  final dir = await getApplicationDocumentsDirectory();
+  final prefix = dir.path;
+  return path.join(prefix, filename);
+}
+
 class Podcast with ChangeNotifier {
   RssFeed _feed;
   RssItem _selectedItem;
@@ -29,6 +35,19 @@ class Podcast with ChangeNotifier {
   set selectedItem(RssItem value) {
     _selectedItem = value;
     notifyListeners();
+  }
+
+  void download(RssItem item) async {
+    http.StreamedRequest req = http.StreamedRequest(
+      'GET',
+      Uri.parse(item.guid),
+    );
+    final res = await req.send();
+    if (res.statusCode != 200)
+      throw Exception('Unexpected HTTP Code: ${res.statusCode}');
+
+    final file = File(await _getDownloadPath(path.split(item.guid).last));
+    res.stream.pipe(file.openWrite()).whenComplete(() => print('Download completed!'));
   }
 }
 
