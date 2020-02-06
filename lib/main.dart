@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -76,18 +77,28 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class MyPage extends StatefulWidget {
+  @override
+  _MyPageState createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: EpisodesPage());
+  }
+}
+
 class EpisodesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Consumer<Podcast>(builder: (context, podcast, _) {
-        return podcast.feed != null
-            ? EpisodeListView(rssFeed: podcast.feed)
-            : Center(
-                child: CircularProgressIndicator(),
-              );
-      }),
-    );
+    return Consumer<Podcast>(builder: (context, podcast, _) {
+      return podcast.feed != null
+          ? EpisodeListView(rssFeed: podcast.feed)
+          : Center(
+              child: CircularProgressIndicator(),
+            );
+    });
   }
 }
 
@@ -209,13 +220,25 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
   FlutterSound _sound;
 
   double _playPosition;
-  Stream<PlayStatus> _playerSubscription;
+  StreamSubscription<PlayStatus> _playerSubscription;
 
   @override
   void initState() {
     super.initState();
     _sound = FlutterSound();
     _playPosition = 0;
+  }
+
+  @override
+  void dispose() {
+    // TODO cleanly clean things up. Since _cleanup is async, sometimes the _playerSubscription listener calls setState after dispose but before it's canceled.
+    _cleanup();
+    super.dispose();
+  }
+
+  void _cleanup() async {
+    await _sound.stopPlayer();
+    _playerSubscription.cancel();
   }
 
   void _stop() async {
@@ -225,13 +248,12 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
 
   void _play(String url) async {
     await _sound.startPlayer(url);
-    _playerSubscription = _sound.onPlayerStateChanged
-      ..listen((e) {
-        if (e != null) {
-          print(e.currentPosition);
-          setState(() => _playPosition = (e.currentPosition / e.duration));
-        }
-      });
+    _playerSubscription = _sound.onPlayerStateChanged.listen((e) {
+      if (e != null) {
+        print(e.currentPosition);
+        setState(() => _playPosition = (e.currentPosition / e.duration));
+      }
+    });
     setState(() => _isPlaying = true);
   }
 
