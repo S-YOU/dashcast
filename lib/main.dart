@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
       create: (_) => Podcast()..parse(url),
       child: MaterialApp(
         title: 'The Boring Show!',
-        home: EpisodesPage(),
+        home: MyPage(),
       ),
     );
   }
@@ -83,9 +83,46 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
+  var navIndex = 0;
+
+  final pages = List<Widget>.unmodifiable([
+    EpisodesPage(),
+    DummyPage(),
+  ]);
+
+  final iconList = List<IconData>.unmodifiable([
+    Icons.hot_tub,
+    Icons.timelapse,
+  ]);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: EpisodesPage());
+    return Scaffold(
+      body: pages[navIndex],
+      bottomNavigationBar: MyNavBar(),
+    );
+  }
+}
+
+class MyNavBar extends StatefulWidget {
+  @override
+  _MyNavBarState createState() => _MyNavBarState();
+}
+
+class _MyNavBarState extends State<MyNavBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 20,
+      color: Colors.amber,
+    );
+  }
+}
+
+class DummyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('Dummy Page'));
   }
 }
 
