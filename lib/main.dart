@@ -133,9 +133,10 @@ class _MyNavBarState extends State<MyNavBar> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           for (var i = 0; i < widget.icons.length; i++)
-            Icon(
-              widget.icons[i],
-              color: i == widget.activeIndex ? Colors.amber : Colors.black,
+            IconButton(
+              icon: Icon(widget.icons[i],
+              color: i == widget.activeIndex ? Colors.yellow[700] : Colors.black54,),
+              onPressed: () => widget.onPressed(i),
             )
         ],
       ),
