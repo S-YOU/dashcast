@@ -99,12 +99,27 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[navIndex],
-      bottomNavigationBar: MyNavBar(),
+      bottomNavigationBar: MyNavBar(
+        icons: iconList,
+        onPressed: (i) => setState(() => navIndex = i),
+        activeIndex: navIndex,
+      ),
     );
   }
 }
 
 class MyNavBar extends StatefulWidget {
+  final List<IconData> icons;
+  final Function(int) onPressed;
+  final int activeIndex;
+
+  const MyNavBar({
+    Key key,
+    @required this.icons,
+    @required this.onPressed,
+    @required this.activeIndex,
+  }) : super(key: key);
+
   @override
   _MyNavBarState createState() => _MyNavBarState();
 }
@@ -113,8 +128,17 @@ class _MyNavBarState extends State<MyNavBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 20,
-      color: Colors.amber,
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          for (var i = 0; i < widget.icons.length; i++)
+            Icon(
+              widget.icons[i],
+              color: i == widget.activeIndex ? Colors.amber : Colors.black,
+            )
+        ],
+      ),
     );
   }
 }
