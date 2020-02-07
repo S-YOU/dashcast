@@ -124,20 +124,27 @@ class MyNavBar extends StatefulWidget {
   _MyNavBarState createState() => _MyNavBarState();
 }
 
-class _MyNavBarState extends State<MyNavBar> {
-  double bubbleRadius;
+class _MyNavBarState extends State<MyNavBar>
+    with SingleTickerProviderStateMixin {
+  double beaconRadius;
+  double maxBeaconRadius = 40;
+  AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    bubbleRadius = 0;
+    beaconRadius = 0;
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
   }
 
   @override
   void didUpdateWidget(MyNavBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.activeIndex != widget.activeIndex) {
-      startAnimation();
+      _startAnimation();
     }
   }
 
@@ -150,7 +157,10 @@ class _MyNavBarState extends State<MyNavBar> {
         children: [
           for (var i = 0; i < widget.icons.length; i++)
             CustomPaint(
-              painter: BeaconPainter(),
+              painter: BeaconPainter(
+                beaconRadius: beaconRadius,
+                maxBeaconRadius: maxBeaconRadius,
+              ),
               child: IconButton(
                 icon: Icon(
                   widget.icons[i],
@@ -166,12 +176,32 @@ class _MyNavBarState extends State<MyNavBar> {
     );
   }
 
-  void startAnimation() {}
+  void _startAnimation() {
+    final _curve = CurvedAnimation(parent: _controller, curve: Curves.linear);
+    Tween<double>(begin: 0, end: 1).animate(_curve)
+      ..addListener(() {
+        setState(() {
+          beaconRadius = maxBeaconRadius * _curve.value;
+        });
+      });
+  }
 }
 
 class BeaconPainter extends CustomPainter {
+  final double beaconRadius;
+  final double maxBeaconRadius;
+
+  BeaconPainter( {
+    @required this.beaconRadius,
+    @required this.maxBeaconRadius,
+  });
+
   @override
-  void paint(Canvas canvas, Size size) {}
+  void paint(Canvas canvas, Size size) {
+    double strokeWidth = beaconRadius < maxBeaconRadius * 0.5 ? beaconRadius : maxBeaconRadius - beaconRadius;
+    final paint =Paint()..color = Colors.blue..strokeWidth = strokeWidth;
+    canvas.drawCircle(Offset(0, 0), beaconRadius, paint);
+  }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => true;
