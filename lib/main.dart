@@ -125,6 +125,22 @@ class MyNavBar extends StatefulWidget {
 }
 
 class _MyNavBarState extends State<MyNavBar> {
+  double bubbleRadius;
+
+  @override
+  void initState() {
+    super.initState();
+    bubbleRadius = 0;
+  }
+
+  @override
+  void didUpdateWidget(MyNavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.activeIndex != widget.activeIndex) {
+      startAnimation();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -133,15 +149,32 @@ class _MyNavBarState extends State<MyNavBar> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           for (var i = 0; i < widget.icons.length; i++)
-            IconButton(
-              icon: Icon(widget.icons[i],
-              color: i == widget.activeIndex ? Colors.yellow[700] : Colors.black54,),
-              onPressed: () => widget.onPressed(i),
+            CustomPaint(
+              painter: BeaconPainter(),
+              child: IconButton(
+                icon: Icon(
+                  widget.icons[i],
+                  color: i == widget.activeIndex
+                      ? Colors.yellow[700]
+                      : Colors.black54,
+                ),
+                onPressed: () => widget.onPressed(i),
+              ),
             )
         ],
       ),
     );
   }
+
+  void startAnimation() {}
+}
+
+class BeaconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {}
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
 
 class DummyPage extends StatelessWidget {
