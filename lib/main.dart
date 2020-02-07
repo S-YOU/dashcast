@@ -190,17 +190,20 @@ class _MyNavBarState extends State<MyNavBar>
 class BeaconPainter extends CustomPainter {
   final double beaconRadius;
   final double maxBeaconRadius;
-
-  BeaconPainter( {
-    @required this.beaconRadius,
-    @required this.maxBeaconRadius,
-  });
-
+  BeaconPainter({this.beaconRadius, this.maxBeaconRadius});
   @override
   void paint(Canvas canvas, Size size) {
-    double strokeWidth = beaconRadius < maxBeaconRadius * 0.5 ? beaconRadius : maxBeaconRadius - beaconRadius;
-    final paint =Paint()..color = Colors.blue..strokeWidth = strokeWidth;
-    canvas.drawCircle(Offset(0, 0), beaconRadius, paint);
+    if (beaconRadius == maxBeaconRadius) {
+      return;
+    }
+    double strokeWidth = beaconRadius < maxBeaconRadius * 0.5
+        ? beaconRadius
+        : maxBeaconRadius - beaconRadius;
+    print('strokeWidth: $strokeWidth');
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = strokeWidth;
+    canvas.drawCircle(Offset(10, 10), beaconRadius, paint);
   }
 
   @override
@@ -210,7 +213,9 @@ class BeaconPainter extends CustomPainter {
 class DummyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Dummy Page'));
+    return Center(
+      child: const Text('Dummy Page'),
+    );
   }
 }
 
