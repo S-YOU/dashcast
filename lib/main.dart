@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -16,7 +16,9 @@ final pathSuffix = 'dashcast/downloads';
 Future<String> _getDownloadPath(String filename) async {
   final dir = await getApplicationDocumentsDirectory();
   final prefix = dir.path;
-  return path.join(prefix, filename);
+  final absolutePath = path.join(prefix, filename);
+  print(absolutePath);
+  return absolutePath;
 }
 
 class Podcast with ChangeNotifier {
@@ -68,7 +70,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => Podcast()..parse(url),
+      builder: (_) => Podcast()..parse(url),
       child: MaterialApp(
         title: 'The Boring Show!',
         home: MyPage(),
@@ -142,6 +144,25 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
     }
   }
 
+  void _startAnimation() {
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+    final _curve = CurvedAnimation(parent: _controller, curve: Curves.linear);
+    Tween<double>(begin: 0, end: 1).animate(_curve)
+      ..addListener(() {
+        setState(() {
+          beaconRadius = maxBeaconRadius * _curve.value;
+          if (beaconRadius == maxBeaconRadius) {
+            beaconRadius = 0;
+          }
+          print('$beaconRadius, $maxBeaconRadius');
+        });
+      });
+    _controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -165,25 +186,6 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
         ],
       ),
     );
-  }
-
-  void _startAnimation() {
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 300),
-      vsync: this,
-    );
-    final _curve = CurvedAnimation(parent: _controller, curve: Curves.linear);
-    Tween<double>(begin: 0, end: 1).animate(_curve)
-      ..addListener(() {
-        setState(() {
-          beaconRadius = maxBeaconRadius * _curve.value;
-          if (beaconRadius == maxBeaconRadius) {
-            beaconRadius = 0;
-          }
-          print('$beaconRadius, $maxBeaconRadius');
-        });
-      });
-    _controller.forward();
   }
 }
 
@@ -222,13 +224,15 @@ class DummyPage extends StatelessWidget {
 class EpisodesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<Podcast>(builder: (context, podcast, _) {
-      return podcast.feed != null
-          ? EpisodeListView(rssFeed: podcast.feed)
-          : Center(
-              child: CircularProgressIndicator(),
-            );
-    });
+    return Consumer<Podcast>(
+      builder: (context, podcast, _) {
+        return podcast.feed != null
+            ? EpisodeListView(rssFeed: podcast.feed)
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+      },
+    );
   }
 }
 
@@ -255,16 +259,15 @@ class EpisodeListView extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               trailing: IconButton(
-                icon: Icon(Icons.arrow_downward),
-                onPressed: () {
-                  Provider.of<Podcast>(context).download(i);
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Downloading ${i.title}'),
-                    ),
-                  );
-                },
-              ),
+                  icon: Icon(Icons.arrow_downward),
+                  onPressed: () {
+                    Provider.of<Podcast>(context).download(i);
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Downloading ${i.title}'),
+                      ),
+                    );
+                  }),
               onTap: () {
                 Provider.of<Podcast>(context).selectedItem = i;
                 Navigator.of(context).push(
@@ -279,10 +282,6 @@ class EpisodeListView extends StatelessWidget {
 }
 
 class PlayerPage extends StatelessWidget {
-  final RssItem item;
-
-  const PlayerPage({Key key, this.item}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -300,23 +299,21 @@ class Player extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final podcast = Provider.of<Podcast>(context);
-
     return Column(
       children: [
         Flexible(
-          flex: 8,
-          child: SingleChildScrollView(
-            child: Column(children: [
-              Image.network(podcast.feed.image.url),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Text(
-                  podcast.selectedItem.description.trim(),
+            flex: 8,
+            child: SingleChildScrollView(
+              child: Column(children: [
+                Image.network(podcast.feed.image.url),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(
+                    podcast.selectedItem.description.trim(),
+                  ),
                 ),
-              ),
-            ]),
-          ),
-        ),
+              ]),
+            )),
         Flexible(
           flex: 2,
           child: Material(
@@ -348,7 +345,6 @@ class PlaybackButtons extends StatefulWidget {
 class _PlaybackButtonState extends State<PlaybackButtons> {
   bool _isPlaying = false;
   FlutterSound _sound;
-
   double _playPosition;
   StreamSubscription<PlayStatus> _playerSubscription;
 
@@ -387,10 +383,6 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
     setState(() => _isPlaying = true);
   }
 
-  void _fastForward() {}
-
-  void _rewind() {}
-
   @override
   Widget build(BuildContext context) {
     final item = Provider.of<Podcast>(context).selectedItem;
@@ -407,10 +399,10 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.fast_rewind),
-              onPressed: () => _rewind(),
+              onPressed: null,
             ),
             IconButton(
-              icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+              icon: _isPlaying ? Icon(Icons.stop) : Icon(Icons.play_arrow),
               onPressed: () {
                 if (_isPlaying) {
                   _stop();
@@ -421,7 +413,7 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
             ),
             IconButton(
               icon: Icon(Icons.fast_forward),
-              onPressed: () => _fastForward(),
+              onPressed: null,
             ),
           ],
         ),
