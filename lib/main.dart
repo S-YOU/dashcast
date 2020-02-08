@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      builder: (_) => Podcast()..parse(url),
+      create: (_) => Podcast()..parse(url),
       child: MaterialApp(
         title: 'The Boring Show!',
         home: MyPage(),
@@ -204,7 +204,8 @@ class BeaconPainter extends CustomPainter {
     print('strokeWidth: $strokeWidth');
     final paint = Paint()
       ..color = Colors.blue
-      ..strokeWidth = strokeWidth;
+      ..strokeWidth = strokeWidth 
+      ..style = PaintingStyle.stroke;
     canvas.drawCircle(Offset(10, 10), beaconRadius, paint);
   }
 
