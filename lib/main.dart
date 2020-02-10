@@ -133,6 +133,10 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     beaconRadius = 0;
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
   }
 
   @override
@@ -145,10 +149,7 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
   }
 
   void _startAnimation() {
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _controller.reset();
     final _curve = CurvedAnimation(parent: _controller, curve: Curves.linear);
     Tween<double>(begin: 0, end: 1).animate(_curve)
       ..addListener(() {
@@ -173,7 +174,7 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
           for (var i = 0; i < widget.icons.length; i++)
             CustomPaint(
                 painter: BeaconPainter(
-                  beaconRadius: beaconRadius,
+                  beaconRadius: i == widget.activeIndex ? beaconRadius : 0,
                   maxBeaconRadius: maxBeaconRadius,
                 ),
                 child: GestureDetector(
@@ -204,9 +205,9 @@ class BeaconPainter extends CustomPainter {
     print('strokeWidth: $strokeWidth');
     final paint = Paint()
       ..color = Colors.blue
-      ..strokeWidth = strokeWidth 
+      ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
-    canvas.drawCircle(Offset(10, 10), beaconRadius, paint);
+    canvas.drawCircle(const Offset(12, 12), beaconRadius, paint);
   }
 
   @override
