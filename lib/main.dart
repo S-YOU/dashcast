@@ -174,9 +174,8 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
           for (var i = 0; i < widget.icons.length; i++)
             CustomPaint(
                 painter: BeaconPainter(
-                  beaconRadius: beaconRadius,
+                  beaconRadius: i == widget.activeIndex ? beaconRadius : 0,
                   maxBeaconRadius: maxBeaconRadius,
-                  isActive: i == widget.activeIndex
                 ),
                 child: GestureDetector(
                   child: Icon(widget.icons[i],
@@ -194,11 +193,9 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
 class BeaconPainter extends CustomPainter {
   final double beaconRadius;
   final double maxBeaconRadius;
-  final bool isActive;
   BeaconPainter({
     @required this.beaconRadius,
     @required this.maxBeaconRadius,
-    @required this.isActive,
   });
   @override
   void paint(Canvas canvas, Size size) {
