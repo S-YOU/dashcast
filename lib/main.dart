@@ -125,14 +125,14 @@ class MyNavBar extends StatefulWidget {
 }
 
 class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
-  double beaconRadius;
-  double maxBeaconRadius = 20;
+  double beaconRadius = 0;
+  double iconScale = 1;
+  final double maxBeaconRadius = 20;
   AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    beaconRadius = 0;
     _controller = AnimationController(
       duration: Duration(milliseconds: 300),
       vsync: this,
@@ -158,7 +158,11 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
           if (beaconRadius == maxBeaconRadius) {
             beaconRadius = 0;
           }
-          print('$beaconRadius, $maxBeaconRadius');
+          if (_curve.value < 0.5) {
+            iconScale = 1 + _curve.value;
+          } else {
+            iconScale = 2 - _curve.value;
+          }
         });
       });
     _controller.forward();
@@ -178,10 +182,13 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
                   maxBeaconRadius: maxBeaconRadius,
                 ),
                 child: GestureDetector(
-                  child: Icon(widget.icons[i],
-                      color: i == widget.activeIndex
-                          ? Colors.yellow[700]
-                          : Colors.black54),
+                  child: Transform.scale(
+                    scale: i == widget.activeIndex ? iconScale : 1,
+                    child: Icon(widget.icons[i],
+                        color: i == widget.activeIndex
+                            ? Colors.yellow[700]
+                            : Colors.black54),
+                  ),
                   onTap: () => widget.onPressed(i),
                 ))
         ],
