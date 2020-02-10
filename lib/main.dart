@@ -178,9 +178,9 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
           for (var i = 0; i < widget.icons.length; i++)
             CustomPaint(
                 painter: BeaconPainter(
-                  beaconRadius: i == widget.activeIndex ? beaconRadius : 0,
-                  maxBeaconRadius: maxBeaconRadius,
-                ),
+                    beaconRadius: i == widget.activeIndex ? beaconRadius : 0,
+                    maxBeaconRadius: maxBeaconRadius,
+                    beaconColor: Colors.purple),
                 child: GestureDetector(
                   child: Transform.scale(
                     scale: i == widget.activeIndex ? iconScale : 1,
@@ -200,21 +200,27 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
 class BeaconPainter extends CustomPainter {
   final double beaconRadius;
   final double maxBeaconRadius;
+  final Color beaconColor;
+  final Color endColor;
   BeaconPainter({
     @required this.beaconRadius,
     @required this.maxBeaconRadius,
-  });
+    @required this.beaconColor,
+  }) : endColor = Color.lerp(beaconColor, Colors.white, 0.5);
+
   @override
   void paint(Canvas canvas, Size size) {
     if (beaconRadius == maxBeaconRadius) {
       return;
     }
+    var animationProgress = beaconRadius / maxBeaconRadius;
     double strokeWidth = beaconRadius < maxBeaconRadius * 0.5
         ? beaconRadius
         : maxBeaconRadius - beaconRadius;
     print('strokeWidth: $strokeWidth');
     final paint = Paint()
-      ..color = Colors.blue
+      ..color =
+          Color.lerp(beaconColor, endColor, animationProgress)
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(const Offset(12, 12), beaconRadius, paint);
