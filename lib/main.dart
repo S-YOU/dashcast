@@ -176,22 +176,53 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           for (var i = 0; i < widget.icons.length; i++)
-            CustomPaint(
-                painter: BeaconPainter(
-                    beaconRadius: i == widget.activeIndex ? beaconRadius : 0,
-                    maxBeaconRadius: maxBeaconRadius,
-                    beaconColor: Colors.purple),
-                child: GestureDetector(
-                  child: Transform.scale(
-                    scale: i == widget.activeIndex ? iconScale : 1,
-                    child: Icon(widget.icons[i],
-                        color: i == widget.activeIndex
-                            ? Colors.yellow[700]
-                            : Colors.black54),
-                  ),
-                  onTap: () => widget.onPressed(i),
-                ))
+            _NavBarIcon(
+              isActive: i == widget.activeIndex,
+              onPressed: widget.onPressed(i),
+              iconData: widget.icons[i],
+              iconScale: iconScale,
+              beaconRadius: beaconRadius,
+              maxBeaconRadius: maxBeaconRadius,
+            )
         ],
+      ),
+    );
+  }
+}
+
+class _NavBarIcon extends StatelessWidget {
+  final bool isActive;
+  final double beaconRadius;
+  final double maxBeaconRadius;
+  final double iconScale;
+  final IconData iconData;
+  final VoidCallback onPressed;
+
+  const _NavBarIcon({
+    Key key,
+    @required this.isActive,
+    @required this.beaconRadius,
+    @required this.maxBeaconRadius,
+    @required this.iconScale,
+    @required this.iconData,
+    @required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: BeaconPainter(
+        beaconRadius: isActive ? beaconRadius : 0,
+        maxBeaconRadius: maxBeaconRadius,
+        beaconColor: Colors.purple,
+      ),
+      child: GestureDetector(
+        child: Transform.scale(
+          scale: isActive ? iconScale : 1,
+          child: Icon(iconData,
+              color: isActive ? Colors.yellow[700] : Colors.black54),
+        ),
+        onTap: onPressed,
       ),
     );
   }
@@ -206,7 +237,7 @@ class BeaconPainter extends CustomPainter {
     @required this.beaconRadius,
     @required this.maxBeaconRadius,
     @required this.beaconColor,
-  }) : endColor = Color.lerp(beaconColor, Colors.white, 0.5);
+  }) : endColor = Color.lerp(beaconColor, Colors.white, 0.9);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -219,8 +250,7 @@ class BeaconPainter extends CustomPainter {
         : maxBeaconRadius - beaconRadius;
     print('strokeWidth: $strokeWidth');
     final paint = Paint()
-      ..color =
-          Color.lerp(beaconColor, endColor, animationProgress)
+      ..color = Color.lerp(beaconColor, endColor, animationProgress)
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(const Offset(12, 12), beaconRadius, paint);
