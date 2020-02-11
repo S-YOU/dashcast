@@ -124,7 +124,7 @@ class MyNavBar extends StatefulWidget {
   _MyNavBarState createState() => _MyNavBarState();
 }
 
-class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
+class _MyNavBarState extends State<MyNavBar> with SingleTickerProviderStateMixin {
   double beaconRadius = 0;
   double iconScale = 1;
   final double maxBeaconRadius = 20;
@@ -178,7 +178,7 @@ class _MyNavBarState extends State<MyNavBar> with TickerProviderStateMixin {
           for (var i = 0; i < widget.icons.length; i++)
             _NavBarIcon(
               isActive: i == widget.activeIndex,
-              onPressed: widget.onPressed(i),
+              onPressed: () => widget.onPressed(i),
               iconData: widget.icons[i],
               iconScale: iconScale,
               beaconRadius: beaconRadius,
