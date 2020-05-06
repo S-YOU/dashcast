@@ -194,7 +194,6 @@ class BeaconPainter extends CustomPainter {
     double strokeWidth = beaconRadius < maxBeaconRadius * 0.5
         ? beaconRadius
         : maxBeaconRadius - beaconRadius;
-    print('strokeWidth: $strokeWidth');
     final paint = Paint()
       ..color = Color.lerp(beaconColor, endColor, animationProgress)
       ..strokeWidth = strokeWidth

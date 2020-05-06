@@ -100,7 +100,6 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
     await _sound.startPlayer(url);
     _playerSubscription = _sound.onPlayerStateChanged.listen((e) {
       if (e != null) {
-        print(e.currentPosition);
         setState(() => _playPosition = (e.currentPosition / e.duration));
       }
     });
@@ -109,7 +108,8 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
 
   @override
   Widget build(BuildContext context) {
-    final item = Provider.of<Podcast>(context).selectedItem;
+    final podcast = Provider.of<Podcast>(context);
+    final item = podcast.selectedItem;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -131,7 +131,8 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
                 if (_isPlaying) {
                   _stop();
                 } else {
-                  _play(item.guid);
+                  String url = podcast.downloadLocations[item] ?? item.guid;
+                  _play(url);
                 }
               },
             ),

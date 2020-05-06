@@ -10,7 +10,7 @@ import 'package:path/path.dart' as path;
 class Podcast with ChangeNotifier {
   RssFeed _feed;
   RssItem _selectedItem;
-  Map<RssItem, String> downloadLocations;
+  Map<RssItem, String> downloadLocations = {};
 
   RssFeed get feed => _feed;
   void parse(String url) async {
