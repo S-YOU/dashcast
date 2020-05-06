@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:provider/provider.dart';
 import 'package:dashcast/player.dart';
 import 'package:dashcast/notifiers.dart';
@@ -70,7 +67,8 @@ class MyNavBar extends StatefulWidget {
   _MyNavBarState createState() => _MyNavBarState();
 }
 
-class _MyNavBarState extends State<MyNavBar> with SingleTickerProviderStateMixin {
+class _MyNavBarState extends State<MyNavBar>
+    with SingleTickerProviderStateMixin {
   double beaconRadius = 0;
   double iconScale = 1;
   final double maxBeaconRadius = 20;
@@ -273,4 +271,3 @@ class EpisodeListView extends StatelessWidget {
     );
   }
 }
-

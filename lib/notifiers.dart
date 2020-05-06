@@ -60,7 +60,7 @@ class Episode extends RssItem with ChangeNotifier {
     final contentLength = res.contentLength;
     var downloadedLength = 0;
 
-    var filePath = await _getDownloadPath(path.split(_item.guid).last);
+    String filePath = await _getDownloadPath(path.split(_item.guid).last);
     final file = File(filePath);
     res.stream
         .map((chunk) {
@@ -71,7 +71,7 @@ class Episode extends RssItem with ChangeNotifier {
         .pipe(file.openWrite())
         .whenComplete(() {
           //TODO: Save to SharedPreferences or similar;
-          _item.downloadLocation = filePath;
+          downloadLocation = filePath;
           notifyListeners();
         })
         .catchError((e) => print('An Error has occurred!!!: $e'));

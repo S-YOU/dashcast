@@ -88,6 +88,7 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
   void _cleanup() async {
     if (_sound.audioState == t_AUDIO_STATE.IS_PLAYING)
       await _sound.stopPlayer();
+    // TODO somehow this gets called from episode list and breaks everything.
     _playerSubscription.cancel();
   }
 
@@ -100,16 +101,21 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
     await _sound.startPlayer(url);
     _playerSubscription = _sound.onPlayerStateChanged.listen((e) {
       if (e != null) {
+        // print(e.currentPosition);
         setState(() => _playPosition = (e.currentPosition / e.duration));
       }
     });
     setState(() => _isPlaying = true);
   }
 
+  void _fastForward() {}
+
+  void _rewind() {}
+
   @override
   Widget build(BuildContext context) {
-    final episode = Provider.of<Podcast>(context);
-    final item = episode.selectedItem;
+    final podcast = Provider.of<Podcast>(context);
+    final item = podcast.selectedItem;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
