@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:provider/provider.dart';
-import 'package:dashcast/main.dart';
+import 'package:dashcast/notifiers.dart';
 
 class PlayerPage extends StatelessWidget {
   @override
