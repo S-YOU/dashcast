@@ -10,7 +10,7 @@ import 'package:path/path.dart' as path;
 class Podcast with ChangeNotifier {
   RssFeed _feed;
   RssItem _selectedItem;
-  Map<String, bool> downloadStatus;
+  Map<RssItem, String> downloadLocations;
 
   RssFeed get feed => _feed;
   void parse(String url) async {
@@ -35,7 +35,8 @@ class Podcast with ChangeNotifier {
     final contentLength = res.contentLength;
     var downloadedLength = 0;
 
-    final file = File(await _getDownloadPath(path.split(item.guid).last));
+    var filePath = await _getDownloadPath(path.split(item.guid).last);
+    final file = File(filePath);
     res.stream
         .map((chunk) {
           downloadedLength += chunk.length;
@@ -44,7 +45,7 @@ class Podcast with ChangeNotifier {
         })
         .pipe(file.openWrite())
         .whenComplete(() {
-          print('Downloading complete');
+          downloadLocations[item] = filePath;
         })
         .catchError((e) => print('An Error has occurred!!!: $e'));
   }
