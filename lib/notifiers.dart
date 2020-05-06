@@ -8,14 +8,14 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 class Podcast with ChangeNotifier {
-  RssFeed _feed;
+  EpisodeFeed _feed;
   Episode _selectedItem;
 
-  RssFeed get feed => _feed;
+  EpisodeFeed get feed => _feed;
   void parse(String url) async {
     final res = await http.get(url);
     final xmlStr = res.body;
-    _feed = RssFeed.parse(xmlStr);
+    _feed = EpisodeFeed.parse(xmlStr);
     notifyListeners();
   }
 
@@ -26,8 +26,27 @@ class Podcast with ChangeNotifier {
   }
 }
 
+class EpisodeFeed extends RssFeed {
+  final RssFeed _feed;
+  List<Episode> items;
+
+  EpisodeFeed(this._feed) {
+    items = _feed.items.map((item) => Episode(item)).toList();
+  }
+
+  static EpisodeFeed parse(xmlStr) {
+    return EpisodeFeed(RssFeed.parse(xmlStr));
+  }
+}
+
 class Episode extends RssItem with ChangeNotifier {
   String downloadLocation;
+  final RssItem item;
+
+  Episode(this.item);
+
+  String get title => item.title;
+  String get description => item.description;
 
   void download(Episode item, [Function(double) callback]) async {
     final req = http.Request('GET', Uri.parse(item.guid));

@@ -235,7 +235,7 @@ class EpisodeListView extends StatelessWidget {
     @required this.rssFeed,
   }) : super(key: key);
 
-  final RssFeed rssFeed;
+  final EpisodeFeed rssFeed;
 
   void downloadStatus(double num) => print('$num');
 
@@ -254,8 +254,7 @@ class EpisodeListView extends StatelessWidget {
               trailing: IconButton(
                   icon: Icon(Icons.arrow_downward),
                   onPressed: () {
-                    //TODO: Fix code below
-                    //Provider.of<Podcast>(context).download(i);
+                    i.download();
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Downloading ${i.title}'),
