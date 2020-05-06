@@ -254,7 +254,8 @@ class EpisodeListView extends StatelessWidget {
               trailing: IconButton(
                   icon: Icon(Icons.arrow_downward),
                   onPressed: () {
-                    Provider.of<Podcast>(context).download(i);
+                    //TODO: Fix code below
+                    //Provider.of<Podcast>(context).download(i);
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Downloading ${i.title}'),

@@ -9,8 +9,7 @@ import 'package:path/path.dart' as path;
 
 class Podcast with ChangeNotifier {
   RssFeed _feed;
-  RssItem _selectedItem;
-  Map<RssItem, String> downloadLocations = {};
+  Episode _selectedItem;
 
   RssFeed get feed => _feed;
   void parse(String url) async {
@@ -20,13 +19,17 @@ class Podcast with ChangeNotifier {
     notifyListeners();
   }
 
-  RssItem get selectedItem => _selectedItem;
-  set selectedItem(RssItem value) {
+  Episode get selectedItem => _selectedItem;
+  set selectedItem(Episode value) {
     _selectedItem = value;
     notifyListeners();
   }
+}
 
-  void download(RssItem item, [Function(double) callback]) async {
+class Episode extends RssItem with ChangeNotifier {
+  String downloadLocation;
+
+  void download(Episode item, [Function(double) callback]) async {
     final req = http.Request('GET', Uri.parse(item.guid));
     final res = await req.send();
     if (res.statusCode != 200)
@@ -45,16 +48,18 @@ class Podcast with ChangeNotifier {
         })
         .pipe(file.openWrite())
         .whenComplete(() {
-          downloadLocations[item] = filePath;
+          //TODO: Save to SharedPreferences or similar;
+          item.downloadLocation = filePath;
+          notifyListeners();
         })
         .catchError((e) => print('An Error has occurred!!!: $e'));
   }
-}
 
-Future<String> _getDownloadPath(String filename) async {
-  final dir = await getApplicationDocumentsDirectory();
-  final prefix = dir.path;
-  final absolutePath = path.join(prefix, filename);
-  print(absolutePath);
-  return absolutePath;
+  Future<String> _getDownloadPath(String filename) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final prefix = dir.path;
+    final absolutePath = path.join(prefix, filename);
+    print(absolutePath);
+    return absolutePath;
+  }
 }

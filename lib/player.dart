@@ -108,8 +108,8 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
 
   @override
   Widget build(BuildContext context) {
-    final podcast = Provider.of<Podcast>(context);
-    final item = podcast.selectedItem;
+    final episode = Provider.of<Podcast>(context);
+    final item = episode.selectedItem;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -131,7 +131,7 @@ class _PlaybackButtonState extends State<PlaybackButtons> {
                 if (_isPlaying) {
                   _stop();
                 } else {
-                  String url = podcast.downloadLocations[item] ?? item.guid;
+                  String url = item.downloadLocation ?? item.guid;
                   _play(url);
                 }
               },
